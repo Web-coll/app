@@ -1,20 +1,18 @@
-# Financial Planning System (Web)
+# Financial Planning System (Web moderna)
 
-Aplicación web simple (HTML/CSS/JS) para:
+Aplicación web en HTML/CSS/JS con flujo guiado y dashboard:
 
-- Recopilar datos financieros clave del usuario.
-- Clasificar su estado financiero (`🔴 Survival`, `🟡 Tight`, `🟢 Healthy`).
-- Analizar estructura de gastos/deuda/riesgo.
-- Generar un plan de acción personalizado y directo.
+- **Pregunta una cosa a la vez** (comenzando por ingresos).
+- Elimina gastos variables como campo manual.
+- Pregunta explícitamente si el usuario tiene **deudas** y **ahorros**.
+- Redirige a un **dashboard** con visual de presupuesto y recomendaciones.
+- Permite administrar el **porcentaje del sobrante** entre deuda (si aplica), ahorro e inversión.
+- Incluye pestaña de **calculadora de interés compuesto**.
 
 ## Ejecutar
-
-Abre `index.html` en tu navegador.
-
-Opcionalmente, puedes usar un servidor local:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Luego visita: `http://localhost:8080`
+Luego abre `http://localhost:8080`.

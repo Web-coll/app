@@ -3,353 +3,323 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Financial Planning System</title>
+  <title>Financial Planning Dashboard</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #111827;
-      --muted: #94a3b8;
-      --text: #e5e7eb;
-      --accent: #22c55e;
-      --danger: #ef4444;
-      --warn: #f59e0b;
-      --ok: #10b981;
-      --border: #1f2937;
+      --bg0:#070b14; --bg1:#0b1220; --card:rgba(17,24,39,.68); --line:#273449;
+      --text:#e5e7eb; --muted:#94a3b8; --primary:#38bdf8; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+      --shadow:0 20px 45px rgba(0,0,0,.35);
     }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text);background:radial-gradient(1000px 600px at 80% -10%,#11213d 0%,transparent 55%),linear-gradient(180deg,var(--bg0),var(--bg1));min-height:100vh}
+    .wrap{max-width:1100px;margin:0 auto;padding:26px 16px 50px}
+    .glass{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+    .hero{padding:18px 18px 8px}.hero h1{margin:0 0 8px;font-size:1.7rem}.hero p{margin:0;color:var(--muted)}
 
-    * { box-sizing: border-box; }
+    .wizard{margin-top:16px;padding:22px;overflow:hidden;position:relative}
+    .progress{height:8px;background:#0b162a;border-radius:999px;border:1px solid #243149;overflow:hidden}
+    .bar{height:100%;background:linear-gradient(90deg,#0ea5e9,#22d3ee);width:0;transition:width .45s ease}
+    .qbox{margin-top:18px;min-height:180px;display:flex;flex-direction:column;justify-content:center;animation:fadeIn .35s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .qtitle{font-size:1.15rem;font-weight:700;margin-bottom:6px}.qhint{color:var(--muted);margin:0 0 14px}
+    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#060d1a;color:var(--text);font-size:1rem}
+    .inline{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .actions{display:flex;gap:10px;margin-top:14px}
+    button{border:0;padding:11px 14px;border-radius:12px;font-weight:700;cursor:pointer;transition:.2s transform,.2s filter}
+    button:hover{transform:translateY(-1px)}
+    .btn-pri{background:linear-gradient(90deg,#22d3ee,#0ea5e9);color:#03243a}
+    .btn-ghost{background:#0a1322;color:#dbeafe;border:1px solid #2d3a4f}
+    .error{margin-top:12px;color:#fecaca;background:rgba(127,29,29,.35);border:1px solid #7f1d1d;padding:10px;border-radius:10px;display:none;white-space:pre-wrap}
 
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(180deg, #020617 0%, #111827 100%);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    .dash{display:none;margin-top:16px;padding:18px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .badge{padding:6px 10px;border-radius:999px;font-weight:700}
+    .survival{background:rgba(239,68,68,.2);color:#fecaca}.tight{background:rgba(245,158,11,.2);color:#fde68a}.healthy{background:rgba(34,197,94,.2);color:#bbf7d0}
 
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 24px 16px 56px;
-    }
+    .tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+    .tab{padding:9px 12px;border-radius:10px;background:#091121;color:#bfdbfe;border:1px solid #283548}
+    .tab.active{background:linear-gradient(90deg,#1d4ed8,#0ea5e9);border-color:transparent;color:white}
+    .panel{display:none;margin-top:14px;animation:fadeIn .3s ease}.panel.active{display:block}
 
-    h1 { margin: 0 0 8px; font-size: 1.8rem; }
-    p.lead { margin-top: 0; color: var(--muted); }
+    .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+    .card{padding:14px;border:1px solid #2a394f;border-radius:14px;background:rgba(9,15,28,.72)}
+    .donut{width:260px;aspect-ratio:1;border-radius:50%;margin:4px auto 10px;position:relative;transition:background .45s ease}
+    .donut::after{content:"";position:absolute;inset:23%;background:#050b17;border:1px solid #24344b;border-radius:50%}
+    .legend{font-size:.92rem;line-height:1.8}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+    .muted{color:var(--muted)}
+    .kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .kpi .card b{font-size:1.1rem}
 
-    .grid {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
+    .sliders label{display:block;margin:10px 0 4px;color:#cbd5e1}
+    input[type="range"]{padding:0;height:8px;background:#0f1d33}
+    .summary{margin-top:8px;font-size:.95rem;color:#d1fae5}
 
-    .card {
-      background: rgba(17, 24, 39, 0.84);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      backdrop-filter: blur(4px);
-    }
-
-    .card h2 { margin: 0 0 12px; font-size: 1.1rem; }
-
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-size: .92rem;
-      color: #cbd5e1;
-    }
-
-    input, select {
-      width: 100%;
-      margin-top: 6px;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #0b1220;
-      color: var(--text);
-    }
-
-    .row2 {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    button {
-      width: 100%;
-      margin-top: 14px;
-      background: var(--accent);
-      color: #052e16;
-      border: 0;
-      border-radius: 10px;
-      font-weight: 700;
-      padding: 12px;
-      cursor: pointer;
-    }
-
-    button:hover { filter: brightness(1.05); }
-
-    .error {
-      margin-top: 10px;
-      color: #fecaca;
-      background: rgba(127, 29, 29, .35);
-      border: 1px solid #7f1d1d;
-      padding: 10px;
-      border-radius: 10px;
-      display: none;
-      white-space: pre-wrap;
-    }
-
-    #result {
-      margin-top: 18px;
-      display: none;
-      line-height: 1.5;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .survival { background: rgba(239, 68, 68, .25); color: #fecaca; }
-    .tight { background: rgba(245, 158, 11, .2); color: #fde68a; }
-    .healthy { background: rgba(16, 185, 129, .25); color: #a7f3d0; }
-
-    ul { margin-top: 6px; }
-    .small { color: var(--muted); font-size: .85rem; }
+    @media (max-width:860px){.grid{grid-template-columns:1fr}.inline{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <main class="container">
-    <h1>Financial Planning System</h1>
-    <p class="lead">Analiza tu situación financiera, clasifica tu estado y genera un plan personalizado claro y accionable.</p>
+  <main class="wrap">
+    <section class="hero glass">
+      <h1>Financial Planning System</h1>
+      <p>Diagnóstico financiero en pasos simples, luego un dashboard con presupuesto, asignación y calculadora de interés compuesto.</p>
+    </section>
 
-    <form id="plannerForm" class="grid" novalidate>
-      <section class="card">
-        <h2>1) Datos financieros (mensuales)</h2>
-        <label>Ingreso mensual (USD)
-          <input type="number" id="income" min="0" step="0.01" placeholder="Ej: 2500" required />
-        </label>
+    <section id="wizard" class="wizard glass">
+      <div class="progress"><div id="progressBar" class="bar"></div></div>
+      <div id="questionBox" class="qbox"></div>
+      <div id="error" class="error"></div>
+    </section>
 
-        <div class="row2">
-          <label>Gastos fijos (vivienda, comida, transporte, servicios)
-            <input type="number" id="fixedExpenses" min="0" step="0.01" required />
-          </label>
-          <label>Gastos variables
-            <input type="number" id="variableExpenses" min="0" step="0.01" required />
-          </label>
+    <section id="dashboard" class="dash glass">
+      <div class="top">
+        <h2 style="margin:0">Tu dashboard financiero</h2>
+        <span id="statusBadge" class="badge"></span>
+      </div>
+      <p id="statusText" class="muted" style="margin:6px 0 2px"></p>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="budget">Presupuesto</button>
+        <button class="tab" data-tab="allocator">Asignación del sobrante</button>
+        <button class="tab" data-tab="compound">Interés compuesto</button>
+      </div>
+
+      <div id="budget" class="panel active">
+        <div class="grid">
+          <article class="card">
+            <h3 style="margin-top:0">Distribución actual del ingreso</h3>
+            <div id="donut" class="donut"></div>
+            <div id="legend" class="legend"></div>
+          </article>
+          <article class="card">
+            <h3 style="margin-top:0">Perfil y plan</h3>
+            <p id="mainProblem"></p>
+            <ul id="insights"></ul>
+            <p id="nextStep" style="margin-bottom:0"></p>
+          </article>
         </div>
-
-        <div class="row2">
-          <label>Deuda total
-            <input type="number" id="debtTotal" min="0" step="0.01" required />
-          </label>
-          <label>Pago mensual de deuda
-            <input type="number" id="debtMonthly" min="0" step="0.01" required />
-          </label>
+        <div class="kpi" style="margin-top:14px">
+          <div class="card"><span class="muted">Ingreso</span><br><b id="kIncome"></b></div>
+          <div class="card"><span class="muted">Gastos fijos</span><br><b id="kFixed"></b></div>
+          <div class="card"><span class="muted">Pago deuda</span><br><b id="kDebt"></b></div>
+          <div class="card"><span class="muted">Sobrante mensual</span><br><b id="kSurplus"></b></div>
         </div>
+      </div>
 
-        <div class="row2">
-          <label>Interés promedio de deuda (%) (si no sabes, estima)
-            <input type="number" id="debtInterest" min="0" step="0.01" placeholder="Opcional" />
-          </label>
-          <label>Ahorros actuales
-            <input type="number" id="savings" min="0" step="0.01" required />
-          </label>
-        </div>
+      <div id="allocator" class="panel">
+        <article class="card sliders">
+          <h3 style="margin-top:0">Administra el porcentaje que sobra</h3>
+          <p class="muted">Este módulo usa únicamente el dinero libre después de gastos fijos (y deuda mínima si aplica).</p>
+          <label>Deuda (%)</label><input id="rDebt" type="range" min="0" max="100" value="0">
+          <label>Ahorro (%)</label><input id="rSave" type="range" min="0" max="100" value="0">
+          <label>Inversión (%)</label><input id="rInvest" type="range" min="0" max="100" value="0">
+          <p id="allocNumbers" class="summary"></p>
+        </article>
+      </div>
 
-        <label>Estabilidad de ingresos
-          <select id="stability" required>
-            <option value="">Selecciona</option>
-            <option value="stable">Estable</option>
-            <option value="variable">Variable</option>
-            <option value="unstable">Inestable</option>
-          </select>
-        </label>
-
-        <button type="submit">Generar plan financiero</button>
-        <div id="errorBox" class="error"></div>
-        <p class="small">Si no conoces un dato exacto, usa una estimación realista.</p>
-      </section>
-
-      <section class="card">
-        <h2>2) Resultado estructurado</h2>
-        <div id="result"></div>
-      </section>
-    </form>
+      <div id="compound" class="panel">
+        <article class="card">
+          <h3 style="margin-top:0">Calculadora de interés compuesto</h3>
+          <div class="inline">
+            <label>Inversión mensual (USD)<input id="cMonthly" type="number" min="0" value="200"></label>
+            <label>Tasa anual esperada (%)<input id="cRate" type="number" min="0" step="0.1" value="8"></label>
+          </div>
+          <div class="inline" style="margin-top:10px">
+            <label>Años<input id="cYears" type="number" min="1" value="15"></label>
+            <label>Aporte inicial (USD)<input id="cInitial" type="number" min="0" value="1000"></label>
+          </div>
+          <div class="actions"><button id="runCompound" class="btn-pri">Calcular</button></div>
+          <p id="compoundOut" style="margin-bottom:0"></p>
+        </article>
+      </div>
+    </section>
   </main>
 
   <script>
-    const form = document.getElementById('plannerForm');
-    const errorBox = document.getElementById('errorBox');
-    const result = document.getElementById('result');
+    const $ = (id) => document.getElementById(id);
+    const state = { answers:{}, step:0, questions:[] };
 
-    function money(value) {
-      return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+    const money = (v) => new Intl.NumberFormat('es-ES',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(v||0);
+    const pct = (v,t) => t>0 ? Math.round((v/t)*100) : 0;
+
+    state.questions = [
+      { id:'income', title:'¿Cuál es tu ingreso mensual?', hint:'Si no es exacto, coloca una estimación realista.', render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 2500">', validate:v=>v>0, parse:v=>Number(v) },
+      { id:'fixed', title:'¿Cuánto suman tus gastos fijos mensuales?', hint:'Incluye vivienda, comida base, transporte y servicios.', render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 1400">', validate:v=>v>=0, parse:v=>Number(v) },
+      { id:'hasDebt', title:'¿Tienes deudas activas?', hint:'Tarjetas, préstamos personales, auto, etc.', render:()=>'<select id="input"><option value="">Selecciona</option><option value="yes">Sí</option><option value="no">No</option></select>', validate:v=>['yes','no'].includes(v), parse:v=>v==='yes' },
+      { id:'debtMonthly', title:'¿Cuál es tu pago mensual total de deuda?', hint:'Solo si tienes deuda. Si no, se define en 0.', when:a=>a.hasDebt, render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 320">', validate:v=>v>=0, parse:v=>Number(v) },
+      { id:'debtTotal', title:'¿Cuál es tu deuda total pendiente?', hint:'Solo si tienes deuda. Si no, se define en 0.', when:a=>a.hasDebt, render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 12000">', validate:v=>v>=0, parse:v=>Number(v) },
+      { id:'hasSavings', title:'¿Actualmente tienes ahorros?', hint:'Fondo de emergencia o dinero reservado.', render:()=>'<select id="input"><option value="">Selecciona</option><option value="yes">Sí</option><option value="no">No</option></select>', validate:v=>['yes','no'].includes(v), parse:v=>v==='yes' },
+      { id:'savings', title:'¿Cuánto tienes ahorrado hoy?', hint:'Solo si tienes ahorros. Si no, se define en 0.', when:a=>a.hasSavings, render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 3000">', validate:v=>v>=0, parse:v=>Number(v) },
+      { id:'stability', title:'¿Cómo es tu estabilidad de ingresos?', hint:'Esto afecta el nivel de riesgo y el plan.', render:()=>'<select id="input"><option value="">Selecciona</option><option value="stable">Estable</option><option value="variable">Variable</option><option value="unstable">Inestable</option></select>', validate:v=>['stable','variable','unstable'].includes(v), parse:v=>v }
+    ];
+
+    function currentQuestion() {
+      const qs = state.questions.filter(q => !q.when || q.when(state.answers));
+      return { list:qs, q:qs[state.step] };
     }
 
-    function pct(part, total) {
-      if (!total || total <= 0) return 0;
-      return Math.round((part / total) * 100);
+    function renderQuestion() {
+      const {list,q} = currentQuestion();
+      if (!q) return buildDashboard();
+      const progress = Math.round((state.step / list.length) * 100);
+      $('progressBar').style.width = progress + '%';
+      $('questionBox').innerHTML = `
+        <div class="qtitle">${q.title}</div>
+        <p class="qhint">${q.hint}</p>
+        ${q.render()}
+        <div class="actions">
+          <button class="btn-pri" id="nextBtn">Continuar</button>
+          ${state.step>0?'<button class="btn-ghost" id="prevBtn">Atrás</button>':''}
+        </div>`;
+      $('error').style.display='none';
+      $('nextBtn').onclick = next;
+      const prev = $('prevBtn'); if (prev) prev.onclick = prevStep;
     }
 
-    function classifyStatus(income, totalExpenses) {
-      const margin = income - totalExpenses;
-      const ratio = income > 0 ? margin / income : -1;
-      if (margin <= 0) return { key: 'survival', badge: '🔴 Survival', text: 'Estás en déficit o al límite: gastas lo mismo o más de lo que ganas.' };
-      if (ratio < 0.15) return { key: 'tight', badge: '🟡 Tight', text: 'Tienes margen pequeño: cualquier imprevisto te desestabiliza.' };
-      return { key: 'healthy', badge: '🟢 Healthy', text: 'Tienes superávit consistente para construir crecimiento.' };
-    }
-
-    function debtUrgency(debtTotal, debtMonthly, income, debtInterest) {
-      const paymentRatio = income > 0 ? debtMonthly / income : 1;
-      if (debtTotal <= 0 || debtMonthly <= 0) return 'Sin urgencia de deuda activa: mantén disciplina y evita deuda de consumo.';
-      if (debtInterest >= 25 || paymentRatio >= 0.35) return 'Urgencia alta: tu deuda te está ahogando. Prioridad absoluta en pagos agresivos.';
-      if (debtInterest >= 12 || paymentRatio >= 0.2) return 'Urgencia media: reduce deuda de forma estructurada antes de acelerar inversión.';
-      return 'Urgencia moderada/baja: continúa pago ordenado sin perder foco en ahorro.';
-    }
-
-    function allocation(statusKey, income, totalExpenses, debtMonthly) {
-      const margin = Math.max(income - totalExpenses, 0);
-      if (statusKey === 'survival') {
-        return {
-          rec: `Gastos esenciales 85-90%, deuda mínima 10-15% (renegociada), inversión 0%.`,
-          immediate: 'Recorta hoy al menos 10% de gastos variables y busca ingreso extra en 7 días.'
-        };
+    function next() {
+      const {q} = currentQuestion();
+      const raw = $('input').value;
+      const numeric = Number(raw);
+      const toValidate = raw === '' ? NaN : (isNaN(numeric) ? raw : numeric);
+      if (!q.validate(toValidate)) {
+        $('error').textContent = 'Dato inválido o faltante. Si no sabes el número exacto, usa una estimación realista.';
+        $('error').style.display = 'block';
+        return;
       }
-      if (statusKey === 'tight') {
-        const savingBase = Math.max(Math.round(margin * 0.3), 0);
-        return {
-          rec: `Superávit aprox ${money(margin)}: 60% deuda, 30% ahorro (${money(savingBase)}), 10% formación/inversión inicial.` ,
-          immediate: 'Automatiza un ahorro pequeño y elimina 1 gasto no esencial esta semana.'
-        };
-      }
-      return {
-        rec: `Ingreso sugerido: 50-60% gastos, 20% ahorro/emergencia, 20-30% inversión de largo plazo (indexados/acciones diversificadas).`,
-        immediate: 'Configura transferencias automáticas el día de cobro para ahorro e inversión.'
+      state.answers[q.id] = q.parse(toValidate);
+      state.step++;
+      renderQuestion();
+    }
+
+    function prevStep(){ state.step=Math.max(0,state.step-1); renderQuestion(); }
+
+    function classify(income,totalOut){
+      const margin = income-totalOut; const ratio = income>0?margin/income:-1;
+      if (margin<=0) return {key:'survival',badge:'🔴 Survival',txt:'Gastas lo mismo o más de lo que ganas. Prioridad: estabilidad total.'};
+      if (ratio<0.15) return {key:'tight',badge:'🟡 Tight',txt:'Tienes poco margen. Un imprevisto puede romper tu mes.'};
+      return {key:'healthy',badge:'🟢 Healthy',txt:'Hay superávit consistente para crecer con disciplina.'};
+    }
+
+    function plan(profile){
+      const out = profile.fixed + profile.debtMonthly;
+      const surplus = profile.income - out;
+      const status = classify(profile.income,out);
+      const risk = status.key==='survival' || profile.stability==='unstable' ? 'Alto' : status.key==='tight' || profile.stability==='variable' ? 'Medio':'Bajo';
+
+      const insights = [];
+      if (pct(profile.fixed,profile.income) > 65) insights.push('Tus gastos fijos están muy altos; renegociar costos estructurales es clave.');
+      if (profile.hasDebt && pct(profile.debtMonthly,profile.income) > 25) insights.push('La deuda consume una parte crítica del ingreso; acelera amortización.');
+      if (!profile.hasSavings || profile.savings < profile.fixed * 3) insights.push('Tu fondo de emergencia no cubre 3 meses de gastos fijos.');
+      if (insights.length===0) insights.push('Tu estructura base es sólida; mantén consistencia y automatización.');
+
+      let nextStep = '';
+      if (status.key==='survival') nextStep = 'No inviertas todavía. Recorta estructura fija y crea ingreso adicional esta semana.';
+      else if (status.key==='tight') nextStep = 'Automatiza ahorro mínimo y concentra el excedente en deuda/colchón.';
+      else nextStep = 'Automatiza inversión mensual diversificada y revisa progreso cada trimestre.';
+
+      return {out,surplus,status,risk,insights,nextStep};
+    }
+
+    function buildDashboard(){
+      const a = state.answers;
+      const profile = {
+        income:a.income, fixed:a.fixed,
+        hasDebt: !!a.hasDebt, debtMonthly:a.hasDebt ? (a.debtMonthly||0) : 0, debtTotal:a.hasDebt ? (a.debtTotal||0):0,
+        hasSavings: !!a.hasSavings, savings:a.hasSavings ? (a.savings||0):0,
+        stability:a.stability
       };
+
+      const p = plan(profile);
+      $('wizard').style.display = 'none';
+      $('dashboard').style.display = 'block';
+
+      const badge = $('statusBadge');
+      badge.textContent = p.status.badge;
+      badge.className = `badge ${p.status.key}`;
+      $('statusText').textContent = `${p.status.txt} Riesgo: ${p.risk}.`;
+      $('mainProblem').innerHTML = `<strong>Problema principal:</strong> ${p.surplus<0 ? `déficit de ${money(Math.abs(p.surplus))}/mes` : `sobrante de ${money(p.surplus)}/mes`}.`;
+      $('insights').innerHTML = p.insights.map(i=>`<li>${i}</li>`).join('');
+      $('nextStep').innerHTML = `<strong>Siguiente paso:</strong> ${p.nextStep}`;
+
+      $('kIncome').textContent = money(profile.income);
+      $('kFixed').textContent = money(profile.fixed);
+      $('kDebt').textContent = money(profile.debtMonthly);
+      $('kSurplus').textContent = money(p.surplus);
+
+      renderBudgetChart(profile,p);
+      initAllocator(profile,p);
+      initCompound(p.surplus);
+      bindTabs();
     }
 
-    function buildPlan(data) {
-      const totalExpenses = data.fixedExpenses + data.variableExpenses + data.debtMonthly;
-      const freeCash = data.income - totalExpenses;
-      const status = classifyStatus(data.income, totalExpenses);
-      const debtMsg = debtUrgency(data.debtTotal, data.debtMonthly, data.income, data.debtInterest);
-
-      const inefficiencies = [];
-      if (pct(data.variableExpenses, data.income) > 30) inefficiencies.push('Tus gastos variables superan 30% del ingreso: hay fuga clara de dinero no esencial.');
-      if (pct(data.fixedExpenses, data.income) > 65) inefficiencies.push('Tus gastos fijos son muy altos: necesitas renegociar vivienda/servicios/transporte.');
-      if (data.stability !== 'stable' && data.savings < (data.fixedExpenses * 3)) inefficiencies.push('Ingresos no estables + fondo de emergencia insuficiente: riesgo elevado ante cualquier corte de ingresos.');
-      if (inefficiencies.length === 0) inefficiencies.push('No hay fugas graves obvias, pero aún puedes optimizar categorías pequeñas recurrentes.');
-
-      const riskLevel = status.key === 'survival' || data.stability === 'unstable'
-        ? 'Alto'
-        : status.key === 'tight' || data.stability === 'variable'
-          ? 'Medio'
-          : 'Bajo';
-
-      const alloc = allocation(status.key, data.income, totalExpenses, data.debtMonthly);
-      const noInvestWarning = status.key === 'survival'
-        ? '<p><strong>Declaración directa:</strong> No deberías invertir todavía. Primero debes salir del déficit y estabilizar flujo de caja.</p>'
-        : '';
-
-      let actionSteps = [];
-      if (status.key === 'survival') {
-        actionSteps = [
-          'Lista y elimina gastos no esenciales inmediatamente (suscripciones, compras impulsivas, ocio no planificado).',
-          'Crea presupuesto de supervivencia por 30 días: solo vivienda, alimentación, transporte, servicios y deuda crítica.',
-          'Renegocia deuda con interés alto y evita nuevas deudas de consumo.',
-          'Aumenta ingreso (horas extra, trabajo adicional, venta de activos no críticos).'
-        ];
-      } else if (status.key === 'tight') {
-        actionSteps = [
-          'Implementa presupuesto optimizado con tope de gasto variable semanal.',
-          'Aplica estrategia de deuda: primero la deuda con mayor interés (avalancha) mientras mantienes mínimos en el resto.',
-          'Inicia ahorro automático pequeño para fondo de emergencia.',
-          'Empieza inversión solo educativa o mínima, sin comprometer liquidez.'
-        ];
-      } else {
-        actionSteps = [
-          'Define presupuesto objetivo por porcentajes y revísalo mensualmente.',
-          'Mantén fondo de emergencia de 3-6 meses antes de subir riesgo de inversión.',
-          'Invierte de forma constante a largo plazo en instrumentos diversificados.',
-          'Evita sobreoperar: la consistencia gana a la especulación.'
-        ];
-      }
-
-      return `
-        <span class="status ${status.key}">${status.badge}</span>
-        <p><strong>Estado financiero:</strong> ${status.text}</p>
-        <p><strong>Problema principal:</strong> ${freeCash < 0 ? `Déficit mensual de ${money(Math.abs(freeCash))}.` : `Margen mensual disponible de ${money(freeCash)}.`}</p>
-
-        <h3>A) Financial Snapshot</h3>
-        <ul>
-          <li>Ingreso: ${money(data.income)}</li>
-          <li>Gastos totales + deuda mensual: ${money(totalExpenses)} (${pct(totalExpenses, data.income)}% del ingreso)</li>
-          <li>Distribución: fijos ${pct(data.fixedExpenses, data.income)}%, variables ${pct(data.variableExpenses, data.income)}%, deuda ${pct(data.debtMonthly, data.income)}%</li>
-        </ul>
-
-        <h3>B) Diagnóstico de gastos</h3>
-        <ul>${inefficiencies.map(i => `<li>${i}</li>`).join('')}</ul>
-
-        <h3>C) Evaluación de deuda</h3>
-        <p>${debtMsg}</p>
-
-        <h3>D) Capacidad de ahorro</h3>
-        <p>${freeCash <= 0 ? 'Actualmente no hay capacidad real de ahorro. Cada dólar debe ir a recuperar equilibrio.' : `Ahorro realista inicial: entre ${money(freeCash * 0.2)} y ${money(freeCash * 0.4)} según estabilidad de ingresos.`}</p>
-
-        <h3>E) Nivel de riesgo</h3>
-        <p><strong>${riskLevel}</strong>. ${riskLevel === 'Alto' ? 'Tu vulnerabilidad financiera es inmediata; prioriza estabilidad.' : riskLevel === 'Medio' ? 'Tienes margen, pero un imprevisto puede romper tu plan si no automatizas control.' : 'Tu estructura permite crecer manteniendo disciplina.'}</p>
-
-        <h3>Plan de acción (paso a paso)</h3>
-        ${noInvestWarning}
-        <ol>${actionSteps.map(step => `<li>${step}</li>`).join('')}</ol>
-
-        <h3>Asignación recomendada</h3>
-        <p>${alloc.rec}</p>
-
-        <h3>Siguiente paso inmediato</h3>
-        <p>${alloc.immediate}</p>
+    function renderBudgetChart(profile,p){
+      const income = profile.income || 1;
+      const fixed = Math.max(profile.fixed,0);
+      const debt = Math.max(profile.debtMonthly,0);
+      const free = Math.max(income-fixed-debt,0);
+      const pFixed = pct(fixed,income), pDebt = pct(debt,income), pFree = Math.max(0,100-pFixed-pDebt);
+      $('donut').style.background = `conic-gradient(#3b82f6 0 ${pFixed}%, #ef4444 ${pFixed}% ${pFixed+pDebt}%, #22c55e ${pFixed+pDebt}% 100%)`;
+      $('legend').innerHTML = `
+        <div><span class="dot" style="background:#3b82f6"></span>Gastos fijos: <b>${pFixed}%</b> (${money(fixed)})</div>
+        <div><span class="dot" style="background:#ef4444"></span>Deuda: <b>${pDebt}%</b> (${money(debt)})</div>
+        <div><span class="dot" style="background:#22c55e"></span>Sobrante administrable: <b>${pFree}%</b> (${money(free)})</div>
       `;
     }
 
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      errorBox.style.display = 'none';
-      result.style.display = 'none';
+    function initAllocator(profile,p){
+      const base = Math.max(profile.income - profile.fixed - profile.debtMonthly,0);
+      let debtPct = profile.hasDebt ? 50 : 0;
+      let savePct = profile.hasSavings ? 30 : 60;
+      let invPct = 100 - debtPct - savePct;
+      $('rDebt').value = debtPct; $('rSave').value = savePct; $('rInvest').value = invPct;
+      if (!profile.hasDebt) $('rDebt').disabled = true;
 
-      const data = {
-        income: Number(document.getElementById('income').value),
-        fixedExpenses: Number(document.getElementById('fixedExpenses').value),
-        variableExpenses: Number(document.getElementById('variableExpenses').value),
-        debtTotal: Number(document.getElementById('debtTotal').value),
-        debtMonthly: Number(document.getElementById('debtMonthly').value),
-        debtInterest: Number(document.getElementById('debtInterest').value || 0),
-        savings: Number(document.getElementById('savings').value),
-        stability: document.getElementById('stability').value
+      const sync = (changed) => {
+        debtPct = Number($('rDebt').value); savePct = Number($('rSave').value); invPct = Number($('rInvest').value);
+        let total = debtPct + savePct + invPct;
+        if (total !== 100) {
+          const delta = total - 100;
+          if (changed === 'debt') savePct = Math.max(0, Math.min(100, savePct - delta));
+          if (changed === 'save') invPct = Math.max(0, Math.min(100, invPct - delta));
+          if (changed === 'invest') savePct = Math.max(0, Math.min(100, savePct - delta));
+          total = debtPct + savePct + invPct;
+          if (total !== 100) invPct = Math.max(0, Math.min(100, invPct - (total-100)));
+        }
+        $('rDebt').value = debtPct; $('rSave').value = savePct; $('rInvest').value = invPct;
+        $('allocNumbers').innerHTML = `Sobre ${money(base)} libres: Deuda <b>${money(base*debtPct/100)}</b>, Ahorro <b>${money(base*savePct/100)}</b>, Inversión <b>${money(base*invPct/100)}</b>.`;
       };
+      ['debt','save','invest'].forEach(k => $(k==='debt'?'rDebt':k==='save'?'rSave':'rInvest').addEventListener('input',()=>sync(k)));
+      sync('invest');
+    }
 
-      const missing = [];
-      if (!(data.income > 0)) missing.push('Ingreso mensual');
-      if (!(data.fixedExpenses >= 0)) missing.push('Gastos fijos');
-      if (!(data.variableExpenses >= 0)) missing.push('Gastos variables');
-      if (!(data.debtTotal >= 0)) missing.push('Deuda total');
-      if (!(data.debtMonthly >= 0)) missing.push('Pago mensual de deuda');
-      if (!(data.savings >= 0)) missing.push('Ahorros actuales');
-      if (!data.stability) missing.push('Estabilidad de ingresos');
+    function initCompound(defaultMonthly){
+      $('cMonthly').value = Math.max(50, Math.round(Math.max(defaultMonthly,0) * 0.4));
+      const run = () => {
+        const m = Math.max(0, Number($('cMonthly').value));
+        const r = Math.max(0, Number($('cRate').value)) / 100;
+        const y = Math.max(1, Number($('cYears').value));
+        const i0 = Math.max(0, Number($('cInitial').value));
+        const n = y * 12; const rm = r / 12;
+        let fv = i0 * Math.pow(1+rm,n);
+        for (let t=1; t<=n; t++) fv += m * Math.pow(1+rm, n-t);
+        const invested = i0 + m*n;
+        $('compoundOut').innerHTML = `Capital final estimado: <b>${money(fv)}</b>.<br>Dinero aportado: ${money(invested)} | Ganancia potencial: ${money(fv - invested)}.`;
+      };
+      $('runCompound').onclick = run;
+      run();
+    }
 
-      if (missing.length > 0) {
-        errorBox.textContent = `Faltan datos clave. Completa:\n- ${missing.join('\n- ')}\n\nSi no sabes el valor exacto, ingresa una estimación realista.`;
-        errorBox.style.display = 'block';
-        return;
-      }
+    function bindTabs(){
+      document.querySelectorAll('.tab').forEach(btn=>{
+        btn.onclick = ()=>{
+          document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+          $(btn.dataset.tab).classList.add('active');
+        };
+      });
+    }
 
-      result.innerHTML = buildPlan(data);
-      result.style.display = 'block';
-    });
+    renderQuestion();
   </script>
 </body>
 </html>
