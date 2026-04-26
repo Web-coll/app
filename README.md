@@ -1,12 +1,17 @@
-# NovaPlan — Landing futurista interactiva
+# PulseFi — Landing + App financiera interactiva
 
-Landing page de alto impacto visual inspirada en patrones de experiencia interactiva premium:
+Interfaz web moderna inspirada en experiencias interactivas premium para ayudar a usuarios a:
 
-- Estética minimalista/tech con tipografía expresiva y aire visual.
-- Scroll storytelling con animaciones fluidas (GSAP + ScrollTrigger).
-- Microinteracciones: hover dinámico y glow reactivo al cursor.
-- Hero inmersivo, bloques de valor, features y CTA final.
-- Simulador interactivo de presupuesto en tiempo real.
+- Diagnosticar su situación financiera en tiempo real.
+- Detectar problemas (gastos innecesarios, presión de deuda, falta de margen).
+- Recibir un plan automático paso a paso.
+- Simular crecimiento de inversión (enfoque bolsa de EE.UU. de largo plazo).
+
+## Stack usado
+
+- HTML/CSS/JS (SPA estática)
+- GSAP + ScrollTrigger (animaciones y storytelling)
+- Chart.js (gráficos en vivo)
 
 ## Ejecutar
 
@@ -14,4 +19,4 @@ Landing page de alto impacto visual inspirada en patrones de experiencia interac
 python3 -m http.server 8080
 ```
 
-Abrir `http://localhost:8080`.
+Abre `http://localhost:8080`.
