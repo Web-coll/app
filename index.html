@@ -2,324 +2,179 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Financial Planning Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NovaPlan — Financial Planning Experience</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg0:#070b14; --bg1:#0b1220; --card:rgba(17,24,39,.68); --line:#273449;
-      --text:#e5e7eb; --muted:#94a3b8; --primary:#38bdf8; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-      --shadow:0 20px 45px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text);background:radial-gradient(1000px 600px at 80% -10%,#11213d 0%,transparent 55%),linear-gradient(180deg,var(--bg0),var(--bg1));min-height:100vh}
-    .wrap{max-width:1100px;margin:0 auto;padding:26px 16px 50px}
-    .glass{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
-    .hero{padding:18px 18px 8px}.hero h1{margin:0 0 8px;font-size:1.7rem}.hero p{margin:0;color:var(--muted)}
+    :root{--bg:#050507;--panel:#0c0c10;--line:#1b1b23;--text:#f5f7fb;--muted:#9aa3b2;--aqua:#2dd4bf;--violet:#8b5cf6;--blue:#38bdf8}
+    *{box-sizing:border-box}html,body{margin:0}
+    body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+    .noise{position:fixed;inset:0;pointer-events:none;opacity:.06;background-image:radial-gradient(circle at 20% 20%,#fff 0 1px,transparent 1px);background-size:4px 4px;mix-blend-mode:soft-light;z-index:0}
+    .cursor-glow{position:fixed;width:280px;height:280px;border-radius:50%;filter:blur(60px);background:radial-gradient(circle,#2dd4bf55,transparent 65%);pointer-events:none;z-index:1;transform:translate(-50%,-50%)}
+    .container{width:min(1140px,92vw);margin:0 auto;position:relative;z-index:2}
+    header{position:fixed;top:14px;left:0;right:0;z-index:30}
+    nav{width:min(1140px,92vw);margin:auto;padding:10px 14px;border:1px solid #ffffff1a;background:#090910a6;border-radius:999px;backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center}
+    .logo{font-weight:800;letter-spacing:.4px}
+    .chip{font-size:.78rem;padding:7px 11px;border-radius:999px;border:1px solid #ffffff2a;color:#b9c2d3}
+    .btn{border:1px solid #ffffff26;color:#fff;padding:10px 15px;border-radius:999px;background:linear-gradient(90deg,#ffffff10,#ffffff04);cursor:pointer;transition:.3s}
+    .btn:hover{transform:translateY(-2px);border-color:#ffffff50}
 
-    .wizard{margin-top:16px;padding:22px;overflow:hidden;position:relative}
-    .progress{height:8px;background:#0b162a;border-radius:999px;border:1px solid #243149;overflow:hidden}
-    .bar{height:100%;background:linear-gradient(90deg,#0ea5e9,#22d3ee);width:0;transition:width .45s ease}
-    .qbox{margin-top:18px;min-height:180px;display:flex;flex-direction:column;justify-content:center;animation:fadeIn .35s ease}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    .qtitle{font-size:1.15rem;font-weight:700;margin-bottom:6px}.qhint{color:var(--muted);margin:0 0 14px}
-    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#060d1a;color:var(--text);font-size:1rem}
-    .inline{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .actions{display:flex;gap:10px;margin-top:14px}
-    button{border:0;padding:11px 14px;border-radius:12px;font-weight:700;cursor:pointer;transition:.2s transform,.2s filter}
-    button:hover{transform:translateY(-1px)}
-    .btn-pri{background:linear-gradient(90deg,#22d3ee,#0ea5e9);color:#03243a}
-    .btn-ghost{background:#0a1322;color:#dbeafe;border:1px solid #2d3a4f}
-    .error{margin-top:12px;color:#fecaca;background:rgba(127,29,29,.35);border:1px solid #7f1d1d;padding:10px;border-radius:10px;display:none;white-space:pre-wrap}
+    section{padding:120px 0}
+    .hero{min-height:100vh;display:grid;align-items:center}
+    .kicker{color:var(--aqua);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase}
+    h1{font-size:clamp(2.2rem,8vw,6rem);line-height:.95;margin:.3em 0 .2em;max-width:12ch}
+    .sub{max-width:55ch;color:var(--muted);font-size:clamp(1rem,2vw,1.2rem)}
+    .hero-actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+    .btn-primary{background:linear-gradient(90deg,var(--aqua),var(--blue));color:#032028;border:none}
+    .hero-visual{position:absolute;right:4vw;top:23vh;width:min(38vw,500px);aspect-ratio:1}
+    .orb{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 120deg,var(--violet),var(--blue),var(--aqua),var(--violet));filter:blur(.5px);animation:spin 14s linear infinite}
+    .orb::after{content:"";position:absolute;inset:22%;background:#050507;border-radius:50%;border:1px solid #ffffff1a}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    .dash{display:none;margin-top:16px;padding:18px}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .badge{padding:6px 10px;border-radius:999px;font-weight:700}
-    .survival{background:rgba(239,68,68,.2);color:#fecaca}.tight{background:rgba(245,158,11,.2);color:#fde68a}.healthy{background:rgba(34,197,94,.2);color:#bbf7d0}
+    .story{display:grid;gap:14px}
+    .story-card,.feature,.cta-box,.simulator{background:linear-gradient(180deg,#ffffff10,#ffffff03);border:1px solid #ffffff1a;border-radius:22px;padding:24px}
+    .story-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .story-card p,.feature p{color:var(--muted)}
 
-    .tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-    .tab{padding:9px 12px;border-radius:10px;background:#091121;color:#bfdbfe;border:1px solid #283548}
-    .tab.active{background:linear-gradient(90deg,#1d4ed8,#0ea5e9);border-color:transparent;color:white}
-    .panel{display:none;margin-top:14px;animation:fadeIn .3s ease}.panel.active{display:block}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .feature{transition:.35s}
+    .feature:hover{transform:translateY(-6px);border-color:#7dd3fc66;box-shadow:0 22px 45px #0ea5e91a}
 
-    .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
-    .card{padding:14px;border:1px solid #2a394f;border-radius:14px;background:rgba(9,15,28,.72)}
-    .donut{width:260px;aspect-ratio:1;border-radius:50%;margin:4px auto 10px;position:relative;transition:background .45s ease}
-    .donut::after{content:"";position:absolute;inset:23%;background:#050b17;border:1px solid #24344b;border-radius:50%}
-    .legend{font-size:.92rem;line-height:1.8}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
-    .muted{color:var(--muted)}
-    .kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .kpi .card b{font-size:1.1rem}
+    .sim-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    .field{margin:10px 0}.field label{display:block;font-size:.9rem;color:#c6ccda;margin-bottom:6px}
+    .field input[type='range']{width:100%}
+    .money{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;letter-spacing:-.02em}
+    .bars{display:grid;gap:8px;margin-top:10px}.bar{height:9px;border-radius:999px;background:#ffffff12;overflow:hidden}.bar>span{height:100%;display:block;background:linear-gradient(90deg,var(--aqua),var(--blue));transition:.3s width}
+    .tag{font-size:.8rem;color:#c7d2fe;padding:6px 10px;border:1px solid #ffffff26;border-radius:999px;display:inline-block}
 
-    .sliders label{display:block;margin:10px 0 4px;color:#cbd5e1}
-    input[type="range"]{padding:0;height:8px;background:#0f1d33}
-    .summary{margin-top:8px;font-size:.95rem;color:#d1fae5}
+    .cta-box{text-align:center;padding:56px 24px}
+    .cta-box h2{font-size:clamp(1.8rem,4vw,3.2rem);margin:.2em 0}
+    .footer{padding:30px 0 40px;color:#7f8897;font-size:.86rem}
 
-    @media (max-width:860px){.grid{grid-template-columns:1fr}.inline{grid-template-columns:1fr}}
+    @media(max-width:980px){.hero-visual{display:none}.story-grid,.features,.sim-wrap{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="hero glass">
-      <h1>Financial Planning System</h1>
-      <p>Diagnóstico financiero en pasos simples, luego un dashboard con presupuesto, asignación y calculadora de interés compuesto.</p>
-    </section>
+  <div class="noise"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
 
-    <section id="wizard" class="wizard glass">
-      <div class="progress"><div id="progressBar" class="bar"></div></div>
-      <div id="questionBox" class="qbox"></div>
-      <div id="error" class="error"></div>
-    </section>
-
-    <section id="dashboard" class="dash glass">
-      <div class="top">
-        <h2 style="margin:0">Tu dashboard financiero</h2>
-        <span id="statusBadge" class="badge"></span>
+  <header>
+    <nav>
+      <div class="logo">NOVAPLAN</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="chip">Financial Planning Experience</span>
+        <button class="btn" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Comenzar</button>
       </div>
-      <p id="statusText" class="muted" style="margin:6px 0 2px"></p>
+    </nav>
+  </header>
 
-      <div class="tabs">
-        <button class="tab active" data-tab="budget">Presupuesto</button>
-        <button class="tab" data-tab="allocator">Asignación del sobrante</button>
-        <button class="tab" data-tab="compound">Interés compuesto</button>
+  <section class="hero">
+    <div class="container">
+      <span class="kicker reveal">Fintech UX / Interactive Landing</span>
+      <h1 class="reveal">Controla tu dinero con una experiencia que se siente viva.</h1>
+      <p class="sub reveal">NovaPlan transforma planificación financiera en una interfaz inmersiva: claridad instantánea, decisiones guiadas y crecimiento inteligente sin fricción.</p>
+      <div class="hero-actions reveal">
+        <button class="btn btn-primary" onclick="document.getElementById('sim').scrollIntoView({behavior:'smooth'})">Explorar demo</button>
+        <button class="btn">Ver roadmap</button>
       </div>
+      <div class="hero-visual"><div class="orb"></div></div>
+    </div>
+  </section>
 
-      <div id="budget" class="panel active">
-        <div class="grid">
-          <article class="card">
-            <h3 style="margin-top:0">Distribución actual del ingreso</h3>
-            <div id="donut" class="donut"></div>
-            <div id="legend" class="legend"></div>
-          </article>
-          <article class="card">
-            <h3 style="margin-top:0">Perfil y plan</h3>
-            <p id="mainProblem"></p>
-            <ul id="insights"></ul>
-            <p id="nextStep" style="margin-bottom:0"></p>
-          </article>
+  <section>
+    <div class="container story">
+      <div class="tag reveal">Storytelling financiero</div>
+      <div class="story-grid">
+        <article class="story-card reveal"><h3>01 · Diagnóstico claro</h3><p>En segundos entiendes en qué estado estás: supervivencia, tensión o crecimiento.</p></article>
+        <article class="story-card reveal"><h3>02 · Prioridades automáticas</h3><p>El sistema recomienda en qué orden mover tu dinero: estabilidad antes que riesgo.</p></article>
+        <article class="story-card reveal"><h3>03 · Acción medible</h3><p>Cada pantalla termina con el siguiente paso exacto para no perder momentum.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="features">
+        <article class="feature reveal"><h3>Microinteracciones premium</h3><p>Hover dinámico, glow reactivo al cursor y transiciones fluidas para una sensación de producto de alto nivel.</p></article>
+        <article class="feature reveal"><h3>Scroll con narrativa</h3><p>Las secciones aparecen con ritmo visual para mantener enfoque, curiosidad y continuidad.</p></article>
+        <article class="feature reveal"><h3>Arquitectura escalable</h3><p>Estructura limpia para evolucionar a React/Next sin rehacer la experiencia visual.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="sim">
+    <div class="container sim-wrap">
+      <article class="simulator reveal">
+        <h3>Simulador interactivo del sobrante mensual</h3>
+        <p class="sub" style="font-size:1rem">Explora cómo distribuir excedente entre deuda, ahorro e inversión. Ajusta y observa impacto al instante.</p>
+        <div class="field"><label>Ingreso mensual</label><input id="income" type="range" min="1000" max="12000" value="3500"></div>
+        <div class="field"><label>Gastos fijos</label><input id="fixed" type="range" min="400" max="9000" value="1800"></div>
+        <div class="field"><label>Pago de deudas</label><input id="debt" type="range" min="0" max="3500" value="350"></div>
+      </article>
+      <article class="simulator reveal">
+        <div class="tag">Resultado en tiempo real</div>
+        <p class="money" id="surplus">$0</p>
+        <p id="status" class="sub" style="font-size:.95rem"></p>
+        <div class="bars">
+          <div>Gastos fijos<div class="bar"><span id="bFixed"></span></div></div>
+          <div>Deuda<div class="bar"><span id="bDebt"></span></div></div>
+          <div>Sobrante<div class="bar"><span id="bFree"></span></div></div>
         </div>
-        <div class="kpi" style="margin-top:14px">
-          <div class="card"><span class="muted">Ingreso</span><br><b id="kIncome"></b></div>
-          <div class="card"><span class="muted">Gastos fijos</span><br><b id="kFixed"></b></div>
-          <div class="card"><span class="muted">Pago deuda</span><br><b id="kDebt"></b></div>
-          <div class="card"><span class="muted">Sobrante mensual</span><br><b id="kSurplus"></b></div>
-        </div>
-      </div>
+      </article>
+    </div>
+  </section>
 
-      <div id="allocator" class="panel">
-        <article class="card sliders">
-          <h3 style="margin-top:0">Administra el porcentaje que sobra</h3>
-          <p class="muted">Este módulo usa únicamente el dinero libre después de gastos fijos (y deuda mínima si aplica).</p>
-          <label>Deuda (%)</label><input id="rDebt" type="range" min="0" max="100" value="0">
-          <label>Ahorro (%)</label><input id="rSave" type="range" min="0" max="100" value="0">
-          <label>Inversión (%)</label><input id="rInvest" type="range" min="0" max="100" value="0">
-          <p id="allocNumbers" class="summary"></p>
-        </article>
+  <section id="cta">
+    <div class="container">
+      <div class="cta-box reveal">
+        <span class="tag">Ready to launch</span>
+        <h2>Convierte tu landing en una experiencia memorable.</h2>
+        <p class="sub" style="margin:0 auto 22px">Diseño minimalista, interacción avanzada y narrativa visual para que cada scroll aumente intención.</p>
+        <button class="btn btn-primary">Solicitar versión MVP</button>
       </div>
+    </div>
+  </section>
 
-      <div id="compound" class="panel">
-        <article class="card">
-          <h3 style="margin-top:0">Calculadora de interés compuesto</h3>
-          <div class="inline">
-            <label>Inversión mensual (USD)<input id="cMonthly" type="number" min="0" value="200"></label>
-            <label>Tasa anual esperada (%)<input id="cRate" type="number" min="0" step="0.1" value="8"></label>
-          </div>
-          <div class="inline" style="margin-top:10px">
-            <label>Años<input id="cYears" type="number" min="1" value="15"></label>
-            <label>Aporte inicial (USD)<input id="cInitial" type="number" min="0" value="1000"></label>
-          </div>
-          <div class="actions"><button id="runCompound" class="btn-pri">Calcular</button></div>
-          <p id="compoundOut" style="margin-bottom:0"></p>
-        </article>
-      </div>
-    </section>
-  </main>
+  <div class="container footer">© 2026 NovaPlan Experience · Inspired by high-end interactive web design patterns.</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script>
-    const $ = (id) => document.getElementById(id);
-    const state = { answers:{}, step:0, questions:[] };
+    const glow = document.getElementById('cursorGlow');
+    window.addEventListener('pointermove', (e)=>{
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
 
-    const money = (v) => new Intl.NumberFormat('es-ES',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(v||0);
-    const pct = (v,t) => t>0 ? Math.round((v/t)*100) : 0;
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.from('.hero .reveal',{y:38,opacity:0,duration:.9,stagger:.08,ease:'power3.out'});
 
-    state.questions = [
-      { id:'income', title:'¿Cuál es tu ingreso mensual?', hint:'Si no es exacto, coloca una estimación realista.', render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 2500">', validate:v=>v>0, parse:v=>Number(v) },
-      { id:'fixed', title:'¿Cuánto suman tus gastos fijos mensuales?', hint:'Incluye vivienda, comida base, transporte y servicios.', render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 1400">', validate:v=>v>=0, parse:v=>Number(v) },
-      { id:'hasDebt', title:'¿Tienes deudas activas?', hint:'Tarjetas, préstamos personales, auto, etc.', render:()=>'<select id="input"><option value="">Selecciona</option><option value="yes">Sí</option><option value="no">No</option></select>', validate:v=>['yes','no'].includes(v), parse:v=>v==='yes' },
-      { id:'debtMonthly', title:'¿Cuál es tu pago mensual total de deuda?', hint:'Solo si tienes deuda. Si no, se define en 0.', when:a=>a.hasDebt, render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 320">', validate:v=>v>=0, parse:v=>Number(v) },
-      { id:'debtTotal', title:'¿Cuál es tu deuda total pendiente?', hint:'Solo si tienes deuda. Si no, se define en 0.', when:a=>a.hasDebt, render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 12000">', validate:v=>v>=0, parse:v=>Number(v) },
-      { id:'hasSavings', title:'¿Actualmente tienes ahorros?', hint:'Fondo de emergencia o dinero reservado.', render:()=>'<select id="input"><option value="">Selecciona</option><option value="yes">Sí</option><option value="no">No</option></select>', validate:v=>['yes','no'].includes(v), parse:v=>v==='yes' },
-      { id:'savings', title:'¿Cuánto tienes ahorrado hoy?', hint:'Solo si tienes ahorros. Si no, se define en 0.', when:a=>a.hasSavings, render:()=>'<input id="input" type="number" min="0" placeholder="Ej: 3000">', validate:v=>v>=0, parse:v=>Number(v) },
-      { id:'stability', title:'¿Cómo es tu estabilidad de ingresos?', hint:'Esto afecta el nivel de riesgo y el plan.', render:()=>'<select id="input"><option value="">Selecciona</option><option value="stable">Estable</option><option value="variable">Variable</option><option value="unstable">Inestable</option></select>', validate:v=>['stable','variable','unstable'].includes(v), parse:v=>v }
-    ];
+    document.querySelectorAll('.reveal').forEach((el)=>{
+      if (el.closest('.hero')) return;
+      gsap.from(el,{scrollTrigger:{trigger:el,start:'top 86%'},y:35,opacity:0,duration:.8,ease:'power2.out'});
+    });
 
-    function currentQuestion() {
-      const qs = state.questions.filter(q => !q.when || q.when(state.answers));
-      return { list:qs, q:qs[state.step] };
+    gsap.to('.orb',{scale:1.06,repeat:-1,yoyo:true,duration:3,ease:'sine.inOut'});
+
+    const $ = id => document.getElementById(id);
+    const fmt = n => new Intl.NumberFormat('es-ES',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+
+    function updateSim(){
+      const income=+$('income').value, fixed=+$('fixed').value, debt=+$('debt').value;
+      const free=Math.max(income-fixed-debt,0);
+      const ratio=free/income;
+      const state= free<=0 ? ['🔴 Survival','Prioriza recorte estructural y elimina inversiones por ahora.'] : ratio<.15 ? ['🟡 Tight','Protege liquidez y acelera fondo de emergencia.'] : ['🟢 Healthy','Puedes combinar ahorro + inversión de largo plazo.'];
+      $('surplus').textContent = fmt(free);
+      $('status').textContent = `${state[0]} · ${state[1]}`;
+      $('bFixed').style.width = Math.min(100,(fixed/income)*100)+'%';
+      $('bDebt').style.width = Math.min(100,(debt/income)*100)+'%';
+      $('bFree').style.width = Math.min(100,(free/income)*100)+'%';
     }
 
-    function renderQuestion() {
-      const {list,q} = currentQuestion();
-      if (!q) return buildDashboard();
-      const progress = Math.round((state.step / list.length) * 100);
-      $('progressBar').style.width = progress + '%';
-      $('questionBox').innerHTML = `
-        <div class="qtitle">${q.title}</div>
-        <p class="qhint">${q.hint}</p>
-        ${q.render()}
-        <div class="actions">
-          <button class="btn-pri" id="nextBtn">Continuar</button>
-          ${state.step>0?'<button class="btn-ghost" id="prevBtn">Atrás</button>':''}
-        </div>`;
-      $('error').style.display='none';
-      $('nextBtn').onclick = next;
-      const prev = $('prevBtn'); if (prev) prev.onclick = prevStep;
-    }
-
-    function next() {
-      const {q} = currentQuestion();
-      const raw = $('input').value;
-      const numeric = Number(raw);
-      const toValidate = raw === '' ? NaN : (isNaN(numeric) ? raw : numeric);
-      if (!q.validate(toValidate)) {
-        $('error').textContent = 'Dato inválido o faltante. Si no sabes el número exacto, usa una estimación realista.';
-        $('error').style.display = 'block';
-        return;
-      }
-      state.answers[q.id] = q.parse(toValidate);
-      state.step++;
-      renderQuestion();
-    }
-
-    function prevStep(){ state.step=Math.max(0,state.step-1); renderQuestion(); }
-
-    function classify(income,totalOut){
-      const margin = income-totalOut; const ratio = income>0?margin/income:-1;
-      if (margin<=0) return {key:'survival',badge:'🔴 Survival',txt:'Gastas lo mismo o más de lo que ganas. Prioridad: estabilidad total.'};
-      if (ratio<0.15) return {key:'tight',badge:'🟡 Tight',txt:'Tienes poco margen. Un imprevisto puede romper tu mes.'};
-      return {key:'healthy',badge:'🟢 Healthy',txt:'Hay superávit consistente para crecer con disciplina.'};
-    }
-
-    function plan(profile){
-      const out = profile.fixed + profile.debtMonthly;
-      const surplus = profile.income - out;
-      const status = classify(profile.income,out);
-      const risk = status.key==='survival' || profile.stability==='unstable' ? 'Alto' : status.key==='tight' || profile.stability==='variable' ? 'Medio':'Bajo';
-
-      const insights = [];
-      if (pct(profile.fixed,profile.income) > 65) insights.push('Tus gastos fijos están muy altos; renegociar costos estructurales es clave.');
-      if (profile.hasDebt && pct(profile.debtMonthly,profile.income) > 25) insights.push('La deuda consume una parte crítica del ingreso; acelera amortización.');
-      if (!profile.hasSavings || profile.savings < profile.fixed * 3) insights.push('Tu fondo de emergencia no cubre 3 meses de gastos fijos.');
-      if (insights.length===0) insights.push('Tu estructura base es sólida; mantén consistencia y automatización.');
-
-      let nextStep = '';
-      if (status.key==='survival') nextStep = 'No inviertas todavía. Recorta estructura fija y crea ingreso adicional esta semana.';
-      else if (status.key==='tight') nextStep = 'Automatiza ahorro mínimo y concentra el excedente en deuda/colchón.';
-      else nextStep = 'Automatiza inversión mensual diversificada y revisa progreso cada trimestre.';
-
-      return {out,surplus,status,risk,insights,nextStep};
-    }
-
-    function buildDashboard(){
-      const a = state.answers;
-      const profile = {
-        income:a.income, fixed:a.fixed,
-        hasDebt: !!a.hasDebt, debtMonthly:a.hasDebt ? (a.debtMonthly||0) : 0, debtTotal:a.hasDebt ? (a.debtTotal||0):0,
-        hasSavings: !!a.hasSavings, savings:a.hasSavings ? (a.savings||0):0,
-        stability:a.stability
-      };
-
-      const p = plan(profile);
-      $('wizard').style.display = 'none';
-      $('dashboard').style.display = 'block';
-
-      const badge = $('statusBadge');
-      badge.textContent = p.status.badge;
-      badge.className = `badge ${p.status.key}`;
-      $('statusText').textContent = `${p.status.txt} Riesgo: ${p.risk}.`;
-      $('mainProblem').innerHTML = `<strong>Problema principal:</strong> ${p.surplus<0 ? `déficit de ${money(Math.abs(p.surplus))}/mes` : `sobrante de ${money(p.surplus)}/mes`}.`;
-      $('insights').innerHTML = p.insights.map(i=>`<li>${i}</li>`).join('');
-      $('nextStep').innerHTML = `<strong>Siguiente paso:</strong> ${p.nextStep}`;
-
-      $('kIncome').textContent = money(profile.income);
-      $('kFixed').textContent = money(profile.fixed);
-      $('kDebt').textContent = money(profile.debtMonthly);
-      $('kSurplus').textContent = money(p.surplus);
-
-      renderBudgetChart(profile,p);
-      initAllocator(profile,p);
-      initCompound(p.surplus);
-      bindTabs();
-    }
-
-    function renderBudgetChart(profile,p){
-      const income = profile.income || 1;
-      const fixed = Math.max(profile.fixed,0);
-      const debt = Math.max(profile.debtMonthly,0);
-      const free = Math.max(income-fixed-debt,0);
-      const pFixed = pct(fixed,income), pDebt = pct(debt,income), pFree = Math.max(0,100-pFixed-pDebt);
-      $('donut').style.background = `conic-gradient(#3b82f6 0 ${pFixed}%, #ef4444 ${pFixed}% ${pFixed+pDebt}%, #22c55e ${pFixed+pDebt}% 100%)`;
-      $('legend').innerHTML = `
-        <div><span class="dot" style="background:#3b82f6"></span>Gastos fijos: <b>${pFixed}%</b> (${money(fixed)})</div>
-        <div><span class="dot" style="background:#ef4444"></span>Deuda: <b>${pDebt}%</b> (${money(debt)})</div>
-        <div><span class="dot" style="background:#22c55e"></span>Sobrante administrable: <b>${pFree}%</b> (${money(free)})</div>
-      `;
-    }
-
-    function initAllocator(profile,p){
-      const base = Math.max(profile.income - profile.fixed - profile.debtMonthly,0);
-      let debtPct = profile.hasDebt ? 50 : 0;
-      let savePct = profile.hasSavings ? 30 : 60;
-      let invPct = 100 - debtPct - savePct;
-      $('rDebt').value = debtPct; $('rSave').value = savePct; $('rInvest').value = invPct;
-      if (!profile.hasDebt) $('rDebt').disabled = true;
-
-      const sync = (changed) => {
-        debtPct = Number($('rDebt').value); savePct = Number($('rSave').value); invPct = Number($('rInvest').value);
-        let total = debtPct + savePct + invPct;
-        if (total !== 100) {
-          const delta = total - 100;
-          if (changed === 'debt') savePct = Math.max(0, Math.min(100, savePct - delta));
-          if (changed === 'save') invPct = Math.max(0, Math.min(100, invPct - delta));
-          if (changed === 'invest') savePct = Math.max(0, Math.min(100, savePct - delta));
-          total = debtPct + savePct + invPct;
-          if (total !== 100) invPct = Math.max(0, Math.min(100, invPct - (total-100)));
-        }
-        $('rDebt').value = debtPct; $('rSave').value = savePct; $('rInvest').value = invPct;
-        $('allocNumbers').innerHTML = `Sobre ${money(base)} libres: Deuda <b>${money(base*debtPct/100)}</b>, Ahorro <b>${money(base*savePct/100)}</b>, Inversión <b>${money(base*invPct/100)}</b>.`;
-      };
-      ['debt','save','invest'].forEach(k => $(k==='debt'?'rDebt':k==='save'?'rSave':'rInvest').addEventListener('input',()=>sync(k)));
-      sync('invest');
-    }
-
-    function initCompound(defaultMonthly){
-      $('cMonthly').value = Math.max(50, Math.round(Math.max(defaultMonthly,0) * 0.4));
-      const run = () => {
-        const m = Math.max(0, Number($('cMonthly').value));
-        const r = Math.max(0, Number($('cRate').value)) / 100;
-        const y = Math.max(1, Number($('cYears').value));
-        const i0 = Math.max(0, Number($('cInitial').value));
-        const n = y * 12; const rm = r / 12;
-        let fv = i0 * Math.pow(1+rm,n);
-        for (let t=1; t<=n; t++) fv += m * Math.pow(1+rm, n-t);
-        const invested = i0 + m*n;
-        $('compoundOut').innerHTML = `Capital final estimado: <b>${money(fv)}</b>.<br>Dinero aportado: ${money(invested)} | Ganancia potencial: ${money(fv - invested)}.`;
-      };
-      $('runCompound').onclick = run;
-      run();
-    }
-
-    function bindTabs(){
-      document.querySelectorAll('.tab').forEach(btn=>{
-        btn.onclick = ()=>{
-          document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-          $(btn.dataset.tab).classList.add('active');
-        };
-      });
-    }
-
-    renderQuestion();
+    ['income','fixed','debt'].forEach(id=>$(id).addEventListener('input',updateSim));
+    updateSim();
   </script>
 </body>
 </html>
