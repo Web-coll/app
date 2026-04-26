@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseFi — Asesor Financiero Interactivo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#050506;--panel:#0f1115;--line:#242937;--text:#f8fafc;--muted:#98a2b3;--green:#22c55e;--blue:#38bdf8;--red:#ef4444}
+    *{box-sizing:border-box}html,body{margin:0}
+    body{font-family:Inter,system-ui,sans-serif;background:radial-gradient(900px 700px at 80% -10%,#0f1f35 0,transparent 60%),var(--bg);color:var(--text);overflow-x:hidden}
+    .glow{position:fixed;inset:auto auto 0 0;width:320px;height:320px;border-radius:50%;pointer-events:none;filter:blur(65px);background:radial-gradient(circle,#38bdf844,transparent 68%);z-index:0;transform:translate(-50%,-50%)}
+    .wrap{width:min(1140px,92vw);margin:auto;position:relative;z-index:1}
+    header{position:sticky;top:12px;z-index:30;padding-top:12px}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border:1px solid #ffffff22;background:#0b0c11c9;border-radius:999px;backdrop-filter:blur(8px)}
+    .logo{font-weight:900;letter-spacing:.5px}.badge{font-size:.8rem;border:1px solid #ffffff2a;padding:6px 10px;border-radius:999px;color:#cdd6e4}
+    .btn{border:1px solid #ffffff33;background:linear-gradient(90deg,#ffffff12,#ffffff04);color:#fff;border-radius:999px;padding:10px 15px;font-weight:700;cursor:pointer;transition:.25s}
+    .btn:hover{transform:translateY(-2px)}.btn.pri{background:linear-gradient(90deg,var(--green),var(--blue));border:none;color:#041319}
+
+    section{padding:86px 0}
+    .hero{min-height:84vh;display:grid;align-items:center}
+    .k{font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue)}
+    h1{font-size:clamp(2.4rem,8vw,6rem);line-height:.95;max-width:13ch;margin:.3em 0 .25em}
+    .sub{color:var(--muted);max-width:58ch}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:26px}
+    .card{background:linear-gradient(180deg,#ffffff0f,#ffffff05);border:1px solid #ffffff1f;border-radius:18px;padding:18px}
+    .f{margin:10px 0}.f label{display:block;font-size:.9rem;color:#c3ccda;margin-bottom:6px}
+    .f input{width:100%;padding:11px;border-radius:11px;border:1px solid #374151;background:#060a11;color:#fff}
+    .pill{display:inline-block;padding:7px 10px;border-radius:999px;font-size:.8rem;margin-right:6px;border:1px solid #ffffff2a}
+    .ok{color:#86efac;border-color:#22c55e55}.bad{color:#fecaca;border-color:#ef444455}.info{color:#bae6fd;border-color:#38bdf855}
+    .num{font-size:clamp(1.7rem,4vw,2.6rem);font-weight:900;letter-spacing:-.02em}
+    .bar{height:10px;border-radius:999px;background:#ffffff14;overflow:hidden}.bar>span{display:block;height:100%;width:0;transition:width .4s ease}
+
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .alerts{display:grid;gap:10px}.alert{padding:12px;border-radius:12px;border:1px solid}
+    .alert.good{border-color:#22c55e66;background:#22c55e15}.alert.warn{border-color:#ef444466;background:#ef444415}
+
+    .timeline{display:grid;gap:12px}.step{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:flex-start;opacity:.45;transition:.35s}
+    .dot{width:14px;height:14px;border-radius:50%;margin-top:5px;background:#334155;border:1px solid #ffffff4a}
+    .step.active{opacity:1}.step.active .dot{background:linear-gradient(180deg,var(--green),#16a34a)}
+    .progress{height:8px;background:#ffffff14;border-radius:999px;overflow:hidden}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--blue));transition:width .5s}
+
+    .sim-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+    .line{display:flex;justify-content:space-between;font-size:.9rem;color:#cfd8e6;margin-top:8px}
+    canvas{max-height:300px}
+
+    .lessons{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .lesson{cursor:pointer;transition:.28s}.lesson:hover{transform:translateY(-5px);border-color:#7dd3fc88}
+    .lesson p{color:var(--muted)}
+
+    .cta{text-align:center;padding:58px 18px}
+    .cta h2{font-size:clamp(1.9rem,5vw,3.4rem);margin:.25em 0}
+    footer{padding:24px 0 42px;color:#798394;font-size:.86rem}
+
+    @media (max-width:940px){.hero-grid,.grid2,.sim-grid,.lessons{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div id="glow" class="glow"></div>
+  <header class="wrap">
+    <nav>
+      <div class="logo">PULSEFI</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="badge">Asesor financiero en vivo</span>
+        <button class="btn" onclick="document.getElementById('hero').scrollIntoView({behavior:'smooth'})">Inicio</button>
+      </div>
+    </nav>
+  </header>
+
+  <section id="hero" class="hero wrap">
+    <div>
+      <div class="k reveal">Interactive Financial System</div>
+      <h1 class="reveal">No necesitas ganar más dinero, necesitas saber usarlo.</h1>
+      <p class="sub reveal">Diagnóstico en menos de 60 segundos: identifica fugas, detecta riesgo, recibe un plan automático y aprende a invertir en bolsa de EE.UU. sin improvisar.</p>
+    </div>
+    <div class="hero-grid">
+      <article class="card reveal">
+        <h3 style="margin-top:0">Input rápido</h3>
+        <div class="f"><label>¿Cuánto ganas al mes? (USD)</label><input id="income" type="number" min="0" value="3500"></div>
+        <div class="f"><label>Gastos esenciales (USD)</label><input id="essential" type="number" min="0" value="1800"></div>
+        <div class="f"><label>Gastos innecesarios (USD)</label><input id="nonEssential" type="number" min="0" value="550"></div>
+        <div class="f"><label>Pago mensual de deudas (USD)</label><input id="debt" type="number" min="0" value="400"></div>
+        <button class="btn pri" id="analyze">Analizar ahora</button>
+      </article>
+      <article class="card reveal">
+        <span class="pill info" id="statusPill">🟡 Calculando...</span>
+        <p class="num" id="freeCash">$0</p>
+        <p class="sub" id="headline" style="font-size:.95rem">Ingresa tus datos para ver tu diagnóstico.</p>
+        <div style="margin:12px 0 6px">% gastos esenciales</div><div class="bar"><span id="bEssential" style="background:#38bdf8"></span></div>
+        <div style="margin:12px 0 6px">% gastos innecesarios</div><div class="bar"><span id="bNonEssential" style="background:#ef4444"></span></div>
+        <div style="margin:12px 0 6px">Capacidad de ahorro/inversión</div><div class="bar"><span id="bCapacity" style="background:#22c55e"></span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap grid2">
+    <article class="card reveal">
+      <h3 style="margin-top:0">Diagnóstico financiero interactivo</h3>
+      <canvas id="budgetChart"></canvas>
+    </article>
+    <article class="card reveal">
+      <h3 style="margin-top:0">Detección de problemas</h3>
+      <div id="alerts" class="alerts"></div>
+    </article>
+  </section>
+
+  <section class="wrap grid2">
+    <article class="card reveal">
+      <h3 style="margin-top:0">Plan automático (desbloqueable)</h3>
+      <div class="progress"><span id="planProgress"></span></div>
+      <div id="timeline" class="timeline" style="margin-top:14px"></div>
+    </article>
+    <article class="card reveal">
+      <h3 style="margin-top:0">Simulador de crecimiento</h3>
+      <div class="f"><label>Aporte mensual (USD)</label><input id="monthlyInvest" type="range" min="50" max="3000" value="300"></div>
+      <div class="f"><label>Retorno anual estimado (%)</label><input id="annualRate" type="range" min="1" max="15" value="8"></div>
+      <div class="f"><label>Años</label><input id="years" type="range" min="1" max="35" value="15"></div>
+      <div class="line"><span>Capital aportado</span><b id="invested">$0</b></div>
+      <div class="line"><span>Valor futuro estimado</span><b id="future">$0</b></div>
+      <canvas id="growthChart" style="margin-top:10px"></canvas>
+    </article>
+  </section>
+
+  <section class="wrap">
+    <h3 class="reveal" style="margin-top:0">Educación integrada</h3>
+    <div class="lessons">
+      <article class="card lesson reveal"><h4>Interés compuesto</h4><p>Es crecimiento sobre crecimiento. El tiempo vale más que “encontrar la acción perfecta”.</p></article>
+      <article class="card lesson reveal"><h4>Bolsa de EE.UU.</h4><p>Para empezar: diversificación con ETFs amplios, aportes periódicos y horizonte largo.</p></article>
+      <article class="card lesson reveal"><h4>Regla de riesgo</h4><p>Sin fondo de emergencia, invertir agresivo suele convertirse en retiro temprano por presión.</p></article>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <article class="card cta reveal">
+      <span class="pill info">Siguiente movimiento</span>
+      <h2>Empieza a tomar control de tu dinero hoy.</h2>
+      <p class="sub" style="margin:0 auto 16px">Haz diagnóstico, ejecuta el plan y convierte disciplina en crecimiento real.</p>
+      <button class="btn pri">Crear cuenta y empezar</button>
+    </article>
+  </section>
+
+  <footer class="wrap">© 2026 PulseFi · Diseño interactivo + inteligencia financiera práctica.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    const $ = (id)=>document.getElementById(id);
+    const money = (n)=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+    const glow = $('glow');
+    window.addEventListener('pointermove',(e)=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';});
+
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.from('.hero .reveal',{y:35,opacity:0,duration:.8,stagger:.08,ease:'power2.out'});
+    document.querySelectorAll('.reveal').forEach((el)=>{
+      if(el.closest('.hero')) return;
+      gsap.from(el,{scrollTrigger:{trigger:el,start:'top 84%'},y:30,opacity:0,duration:.75,ease:'power2.out'});
+    });
+
+    const budgetChart = new Chart($('budgetChart'), {
+      type:'doughnut',
+      data:{labels:['Esenciales','Innecesarios','Deuda','Libre'],datasets:[{data:[40,20,20,20],backgroundColor:['#38bdf8','#ef4444','#f59e0b','#22c55e'],borderWidth:0}]},
+      options:{plugins:{legend:{labels:{color:'#d6deea'}}},cutout:'64%'}
+    });
+
+    const growthChart = new Chart($('growthChart'), {
+      type:'line',
+      data:{labels:[0],datasets:[{label:'Valor proyectado',data:[0],borderColor:'#22c55e',pointRadius:0,tension:.35}]},
+      options:{plugins:{legend:{labels:{color:'#d6deea'}}},scales:{x:{ticks:{color:'#a5b4c7'}},y:{ticks:{color:'#a5b4c7'}}}}
+    });
+
+    function classify(free, income){
+      const ratio = income>0 ? free/income : 0;
+      if(free<=0) return ['🔴 Survival','bad','Estás en déficit. Primero estabiliza, luego crece.'];
+      if(ratio<0.18) return ['🟡 Tight','info','Tienes margen limitado. Optimiza y crea colchón.'];
+      return ['🟢 Healthy','ok','Tienes estructura para ahorrar e invertir con disciplina.'];
+    }
+
+    function analyze(){
+      const income = Number($('income').value||0);
+      const essential = Number($('essential').value||0);
+      const non = Number($('nonEssential').value||0);
+      const debt = Number($('debt').value||0);
+      const free = income-essential-non-debt;
+
+      const [tag, cls, text] = classify(free,income);
+      $('statusPill').textContent = tag;
+      $('statusPill').className = `pill ${cls}`;
+      $('freeCash').textContent = money(free);
+      $('headline').textContent = text;
+
+      const pE = income>0 ? Math.max(0,Math.min(100,(essential/income)*100)) : 0;
+      const pN = income>0 ? Math.max(0,Math.min(100,(non/income)*100)) : 0;
+      const pC = income>0 ? Math.max(0,Math.min(100,(Math.max(free,0)/income)*100)) : 0;
+      $('bEssential').style.width = pE + '%';
+      $('bNonEssential').style.width = pN + '%';
+      $('bCapacity').style.width = pC + '%';
+
+      budgetChart.data.datasets[0].data = [Math.max(essential,0),Math.max(non,0),Math.max(debt,0),Math.max(free,0)];
+      budgetChart.update();
+
+      const alerts = [];
+      if (pN > 18) alerts.push(['warn','Gasto innecesario alto','Estás por encima de 18% en gastos prescindibles. Recorta primero aquí.']);
+      if (debt > income*0.25) alerts.push(['warn','Deuda agresiva','Tu deuda consume más de 25% del ingreso. Prioridad: amortizar.']);
+      if (free <= 0) alerts.push(['warn','Sin margen de inversión','No inviertas todavía; necesitas flujo positivo estable.']);
+      if (alerts.length===0) alerts.push(['good','Estructura saludable','Tu base es buena. Puedes pasar a ahorro e inversión constante.']);
+      $('alerts').innerHTML = alerts.map(a=>`<div class="alert ${a[0]}"><b>${a[1]}</b><div style="margin-top:4px">${a[2]}</div></div>`).join('');
+
+      const steps = [
+        ['Paso 1 · Recorta fugas', 'Reduce gastos innecesarios al menos 20% en 14 días.'],
+        ['Paso 2 · Fondo de emergencia', 'Construye 3-6 meses de gastos esenciales.'],
+        ['Paso 3 · Inversión en bolsa EE.UU.', 'Aporta mensual en ETFs diversificados y horizonte largo.']
+      ];
+      let unlocked = free<=0 ? 1 : free < income*0.18 ? 2 : 3;
+      $('planProgress').style.width = (unlocked/3*100) + '%';
+      $('timeline').innerHTML = steps.map((s,i)=>`<div class="step ${i<unlocked?'active':''}"><span class="dot"></span><div><b>${s[0]}</b><div style="color:#9fb0c6">${s[1]}</div></div></div>`).join('');
+
+      updateGrowth(Math.max(50,Math.round(Math.max(free,0)*0.35)));
+      gsap.fromTo('#freeCash',{scale:1.05},{scale:1,duration:.35,ease:'power2.out'});
+    }
+
+    function updateGrowth(seed){
+      const m = Number($('monthlyInvest').value || seed || 300);
+      const r = Number($('annualRate').value || 8) / 100;
+      const years = Number($('years').value || 15);
+      const rm = r/12; const n = years*12;
+      let fv = 0; const pts=[];
+      for(let y=1;y<=years;y++){
+        const months = y*12;
+        let v = 0;
+        for(let t=1;t<=months;t++) v += m*Math.pow(1+rm, months-t);
+        pts.push(Math.round(v));
+        if (y===years) fv=v;
+      }
+      $('invested').textContent = money(m*n);
+      $('future').textContent = money(fv);
+      growthChart.data.labels = Array.from({length:years},(_,i)=>`${i+1}a`);
+      growthChart.data.datasets[0].data = pts;
+      growthChart.update();
+    }
+
+    $('analyze').addEventListener('click', analyze);
+    ['monthlyInvest','annualRate','years'].forEach(id=>$(id).addEventListener('input', ()=>updateGrowth()));
+    analyze();
+  </script>
+</body>
+</html>
