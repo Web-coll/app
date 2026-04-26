@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Financial Planning System</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --ok: #10b981;
+      --border: #1f2937;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #020617 0%, #111827 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+
+    h1 { margin: 0 0 8px; font-size: 1.8rem; }
+    p.lead { margin-top: 0; color: var(--muted); }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .card {
+      background: rgba(17, 24, 39, 0.84);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+
+    .card h2 { margin: 0 0 12px; font-size: 1.1rem; }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: .92rem;
+      color: #cbd5e1;
+    }
+
+    input, select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #0b1220;
+      color: var(--text);
+    }
+
+    .row2 {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    button {
+      width: 100%;
+      margin-top: 14px;
+      background: var(--accent);
+      color: #052e16;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 700;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    button:hover { filter: brightness(1.05); }
+
+    .error {
+      margin-top: 10px;
+      color: #fecaca;
+      background: rgba(127, 29, 29, .35);
+      border: 1px solid #7f1d1d;
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    #result {
+      margin-top: 18px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .survival { background: rgba(239, 68, 68, .25); color: #fecaca; }
+    .tight { background: rgba(245, 158, 11, .2); color: #fde68a; }
+    .healthy { background: rgba(16, 185, 129, .25); color: #a7f3d0; }
+
+    ul { margin-top: 6px; }
+    .small { color: var(--muted); font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>Financial Planning System</h1>
+    <p class="lead">Analiza tu situación financiera, clasifica tu estado y genera un plan personalizado claro y accionable.</p>
+
+    <form id="plannerForm" class="grid" novalidate>
+      <section class="card">
+        <h2>1) Datos financieros (mensuales)</h2>
+        <label>Ingreso mensual (USD)
+          <input type="number" id="income" min="0" step="0.01" placeholder="Ej: 2500" required />
+        </label>
+
+        <div class="row2">
+          <label>Gastos fijos (vivienda, comida, transporte, servicios)
+            <input type="number" id="fixedExpenses" min="0" step="0.01" required />
+          </label>
+          <label>Gastos variables
+            <input type="number" id="variableExpenses" min="0" step="0.01" required />
+          </label>
+        </div>
+
+        <div class="row2">
+          <label>Deuda total
+            <input type="number" id="debtTotal" min="0" step="0.01" required />
+          </label>
+          <label>Pago mensual de deuda
+            <input type="number" id="debtMonthly" min="0" step="0.01" required />
+          </label>
+        </div>
+
+        <div class="row2">
+          <label>Interés promedio de deuda (%) (si no sabes, estima)
+            <input type="number" id="debtInterest" min="0" step="0.01" placeholder="Opcional" />
+          </label>
+          <label>Ahorros actuales
+            <input type="number" id="savings" min="0" step="0.01" required />
+          </label>
+        </div>
+
+        <label>Estabilidad de ingresos
+          <select id="stability" required>
+            <option value="">Selecciona</option>
+            <option value="stable">Estable</option>
+            <option value="variable">Variable</option>
+            <option value="unstable">Inestable</option>
+          </select>
+        </label>
+
+        <button type="submit">Generar plan financiero</button>
+        <div id="errorBox" class="error"></div>
+        <p class="small">Si no conoces un dato exacto, usa una estimación realista.</p>
+      </section>
+
+      <section class="card">
+        <h2>2) Resultado estructurado</h2>
+        <div id="result"></div>
+      </section>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('plannerForm');
+    const errorBox = document.getElementById('errorBox');
+    const result = document.getElementById('result');
+
+    function money(value) {
+      return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+    }
+
+    function pct(part, total) {
+      if (!total || total <= 0) return 0;
+      return Math.round((part / total) * 100);
+    }
+
+    function classifyStatus(income, totalExpenses) {
+      const margin = income - totalExpenses;
+      const ratio = income > 0 ? margin / income : -1;
+      if (margin <= 0) return { key: 'survival', badge: '🔴 Survival', text: 'Estás en déficit o al límite: gastas lo mismo o más de lo que ganas.' };
+      if (ratio < 0.15) return { key: 'tight', badge: '🟡 Tight', text: 'Tienes margen pequeño: cualquier imprevisto te desestabiliza.' };
+      return { key: 'healthy', badge: '🟢 Healthy', text: 'Tienes superávit consistente para construir crecimiento.' };
+    }
+
+    function debtUrgency(debtTotal, debtMonthly, income, debtInterest) {
+      const paymentRatio = income > 0 ? debtMonthly / income : 1;
+      if (debtTotal <= 0 || debtMonthly <= 0) return 'Sin urgencia de deuda activa: mantén disciplina y evita deuda de consumo.';
+      if (debtInterest >= 25 || paymentRatio >= 0.35) return 'Urgencia alta: tu deuda te está ahogando. Prioridad absoluta en pagos agresivos.';
+      if (debtInterest >= 12 || paymentRatio >= 0.2) return 'Urgencia media: reduce deuda de forma estructurada antes de acelerar inversión.';
+      return 'Urgencia moderada/baja: continúa pago ordenado sin perder foco en ahorro.';
+    }
+
+    function allocation(statusKey, income, totalExpenses, debtMonthly) {
+      const margin = Math.max(income - totalExpenses, 0);
+      if (statusKey === 'survival') {
+        return {
+          rec: `Gastos esenciales 85-90%, deuda mínima 10-15% (renegociada), inversión 0%.`,
+          immediate: 'Recorta hoy al menos 10% de gastos variables y busca ingreso extra en 7 días.'
+        };
+      }
+      if (statusKey === 'tight') {
+        const savingBase = Math.max(Math.round(margin * 0.3), 0);
+        return {
+          rec: `Superávit aprox ${money(margin)}: 60% deuda, 30% ahorro (${money(savingBase)}), 10% formación/inversión inicial.` ,
+          immediate: 'Automatiza un ahorro pequeño y elimina 1 gasto no esencial esta semana.'
+        };
+      }
+      return {
+        rec: `Ingreso sugerido: 50-60% gastos, 20% ahorro/emergencia, 20-30% inversión de largo plazo (indexados/acciones diversificadas).`,
+        immediate: 'Configura transferencias automáticas el día de cobro para ahorro e inversión.'
+      };
+    }
+
+    function buildPlan(data) {
+      const totalExpenses = data.fixedExpenses + data.variableExpenses + data.debtMonthly;
+      const freeCash = data.income - totalExpenses;
+      const status = classifyStatus(data.income, totalExpenses);
+      const debtMsg = debtUrgency(data.debtTotal, data.debtMonthly, data.income, data.debtInterest);
+
+      const inefficiencies = [];
+      if (pct(data.variableExpenses, data.income) > 30) inefficiencies.push('Tus gastos variables superan 30% del ingreso: hay fuga clara de dinero no esencial.');
+      if (pct(data.fixedExpenses, data.income) > 65) inefficiencies.push('Tus gastos fijos son muy altos: necesitas renegociar vivienda/servicios/transporte.');
+      if (data.stability !== 'stable' && data.savings < (data.fixedExpenses * 3)) inefficiencies.push('Ingresos no estables + fondo de emergencia insuficiente: riesgo elevado ante cualquier corte de ingresos.');
+      if (inefficiencies.length === 0) inefficiencies.push('No hay fugas graves obvias, pero aún puedes optimizar categorías pequeñas recurrentes.');
+
+      const riskLevel = status.key === 'survival' || data.stability === 'unstable'
+        ? 'Alto'
+        : status.key === 'tight' || data.stability === 'variable'
+          ? 'Medio'
+          : 'Bajo';
+
+      const alloc = allocation(status.key, data.income, totalExpenses, data.debtMonthly);
+      const noInvestWarning = status.key === 'survival'
+        ? '<p><strong>Declaración directa:</strong> No deberías invertir todavía. Primero debes salir del déficit y estabilizar flujo de caja.</p>'
+        : '';
+
+      let actionSteps = [];
+      if (status.key === 'survival') {
+        actionSteps = [
+          'Lista y elimina gastos no esenciales inmediatamente (suscripciones, compras impulsivas, ocio no planificado).',
+          'Crea presupuesto de supervivencia por 30 días: solo vivienda, alimentación, transporte, servicios y deuda crítica.',
+          'Renegocia deuda con interés alto y evita nuevas deudas de consumo.',
+          'Aumenta ingreso (horas extra, trabajo adicional, venta de activos no críticos).'
+        ];
+      } else if (status.key === 'tight') {
+        actionSteps = [
+          'Implementa presupuesto optimizado con tope de gasto variable semanal.',
+          'Aplica estrategia de deuda: primero la deuda con mayor interés (avalancha) mientras mantienes mínimos en el resto.',
+          'Inicia ahorro automático pequeño para fondo de emergencia.',
+          'Empieza inversión solo educativa o mínima, sin comprometer liquidez.'
+        ];
+      } else {
+        actionSteps = [
+          'Define presupuesto objetivo por porcentajes y revísalo mensualmente.',
+          'Mantén fondo de emergencia de 3-6 meses antes de subir riesgo de inversión.',
+          'Invierte de forma constante a largo plazo en instrumentos diversificados.',
+          'Evita sobreoperar: la consistencia gana a la especulación.'
+        ];
+      }
+
+      return `
+        <span class="status ${status.key}">${status.badge}</span>
+        <p><strong>Estado financiero:</strong> ${status.text}</p>
+        <p><strong>Problema principal:</strong> ${freeCash < 0 ? `Déficit mensual de ${money(Math.abs(freeCash))}.` : `Margen mensual disponible de ${money(freeCash)}.`}</p>
+
+        <h3>A) Financial Snapshot</h3>
+        <ul>
+          <li>Ingreso: ${money(data.income)}</li>
+          <li>Gastos totales + deuda mensual: ${money(totalExpenses)} (${pct(totalExpenses, data.income)}% del ingreso)</li>
+          <li>Distribución: fijos ${pct(data.fixedExpenses, data.income)}%, variables ${pct(data.variableExpenses, data.income)}%, deuda ${pct(data.debtMonthly, data.income)}%</li>
+        </ul>
+
+        <h3>B) Diagnóstico de gastos</h3>
+        <ul>${inefficiencies.map(i => `<li>${i}</li>`).join('')}</ul>
+
+        <h3>C) Evaluación de deuda</h3>
+        <p>${debtMsg}</p>
+
+        <h3>D) Capacidad de ahorro</h3>
+        <p>${freeCash <= 0 ? 'Actualmente no hay capacidad real de ahorro. Cada dólar debe ir a recuperar equilibrio.' : `Ahorro realista inicial: entre ${money(freeCash * 0.2)} y ${money(freeCash * 0.4)} según estabilidad de ingresos.`}</p>
+
+        <h3>E) Nivel de riesgo</h3>
+        <p><strong>${riskLevel}</strong>. ${riskLevel === 'Alto' ? 'Tu vulnerabilidad financiera es inmediata; prioriza estabilidad.' : riskLevel === 'Medio' ? 'Tienes margen, pero un imprevisto puede romper tu plan si no automatizas control.' : 'Tu estructura permite crecer manteniendo disciplina.'}</p>
+
+        <h3>Plan de acción (paso a paso)</h3>
+        ${noInvestWarning}
+        <ol>${actionSteps.map(step => `<li>${step}</li>`).join('')}</ol>
+
+        <h3>Asignación recomendada</h3>
+        <p>${alloc.rec}</p>
+
+        <h3>Siguiente paso inmediato</h3>
+        <p>${alloc.immediate}</p>
+      `;
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      errorBox.style.display = 'none';
+      result.style.display = 'none';
+
+      const data = {
+        income: Number(document.getElementById('income').value),
+        fixedExpenses: Number(document.getElementById('fixedExpenses').value),
+        variableExpenses: Number(document.getElementById('variableExpenses').value),
+        debtTotal: Number(document.getElementById('debtTotal').value),
+        debtMonthly: Number(document.getElementById('debtMonthly').value),
+        debtInterest: Number(document.getElementById('debtInterest').value || 0),
+        savings: Number(document.getElementById('savings').value),
+        stability: document.getElementById('stability').value
+      };
+
+      const missing = [];
+      if (!(data.income > 0)) missing.push('Ingreso mensual');
+      if (!(data.fixedExpenses >= 0)) missing.push('Gastos fijos');
+      if (!(data.variableExpenses >= 0)) missing.push('Gastos variables');
+      if (!(data.debtTotal >= 0)) missing.push('Deuda total');
+      if (!(data.debtMonthly >= 0)) missing.push('Pago mensual de deuda');
+      if (!(data.savings >= 0)) missing.push('Ahorros actuales');
+      if (!data.stability) missing.push('Estabilidad de ingresos');
+
+      if (missing.length > 0) {
+        errorBox.textContent = `Faltan datos clave. Completa:\n- ${missing.join('\n- ')}\n\nSi no sabes el valor exacto, ingresa una estimación realista.`;
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      result.innerHTML = buildPlan(data);
+      result.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
