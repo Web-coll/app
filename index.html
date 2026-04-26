@@ -132,6 +132,21 @@
     </div>
   </section>
 
+  <section class="wrap grid2">
+    <article class="card reveal">
+      <h3 style="margin-top:0">Perfil financiero (localStorage)</h3>
+      <div class="f"><label>Ingreso mensual (USD)</label><input id="profileIncome" type="number" min="0" value="3500"></div>
+      <div class="f"><label>Ahorros actuales (USD)</label><input id="profileSavings" type="number" min="0" value="4500"></div>
+      <div class="f"><label>Deudas totales (USD)</label><input id="profileDebt" type="number" min="0" value="12000"></div>
+      <button class="btn pri" id="saveProfile">Guardar perfil</button>
+      <button class="btn" id="generatePlan" style="margin-left:8px">Generar recomendación</button>
+    </article>
+    <article class="card reveal">
+      <h3 style="margin-top:0">Chat de recomendaciones</h3>
+      <div id="adviceOutput" class="sub" style="font-size:.96rem;white-space:pre-line">Guarda tu perfil y genera tu plan personalizado de 30 días.</div>
+    </article>
+  </section>
+
   <section class="wrap">
     <article class="card cta reveal">
       <span class="pill info">Siguiente movimiento</span>
@@ -241,8 +256,73 @@
       growthChart.update();
     }
 
+    const profileKey = 'pulsefi.profile';
+    const defaultProfile = { income: 3500, savings: 4500, debt: 12000 };
+    function loadProfile(){
+      const raw = localStorage.getItem(profileKey);
+      const p = raw ? JSON.parse(raw) : defaultProfile;
+      $('profileIncome').value = p.income ?? defaultProfile.income;
+      $('profileSavings').value = p.savings ?? defaultProfile.savings;
+      $('profileDebt').value = p.debt ?? defaultProfile.debt;
+    }
+    function saveProfile(){
+      const profile = {
+        income: Number($('profileIncome').value || 0),
+        savings: Number($('profileSavings').value || 0),
+        debt: Number($('profileDebt').value || 0)
+      };
+      localStorage.setItem(profileKey, JSON.stringify(profile));
+      return profile;
+    }
+    function generateAdvice(){
+      const p = saveProfile();
+      const monthlyDebtPayment = Math.round(p.debt * 0.02);
+      const disposable = Math.max(p.income - monthlyDebtPayment, 0);
+      const needs = Math.round(disposable * 0.5);
+      const save = Math.round(disposable * 0.2);
+      const invest = Math.round(disposable * 0.3);
+      const emergencyMonths = needs > 0 ? (p.savings / needs).toFixed(1) : '0';
+      const debtRatio = p.income > 0 ? Math.round((monthlyDebtPayment / p.income) * 100) : 0;
+
+      $('adviceOutput').textContent =
+`Resumen actual
+• Ingreso mensual: ${money(p.income)} y pago estimado de deuda: ${money(monthlyDebtPayment)} (${debtRatio}% del ingreso).
+• Ahorros acumulados: ${money(p.savings)} (~${emergencyMonths} meses de gastos base).
+• Deuda total: ${money(p.debt)}. Prioridad: bajar costo financiero y evitar nuevos créditos de consumo.
+
+Distribución 50/20/30 adaptada
+• Gastos (50%): ${money(needs)}
+• Ahorro (20%): ${money(save)}
+• Inversión (30%): ${money(invest)}
+
+Plan de 30 días (acción concreta)
+1) Día 1-3: separa 3 cuentas/buckets: gastos, ahorro, inversión.
+2) Día 4-7: automatiza transferencias el día de cobro: 20% ahorro + 30% inversión.
+3) Día 8-14: recorta 2 gastos variables y redirige ese monto a deuda.
+4) Día 15-21: crea/ajusta fondo de emergencia hasta 3 meses mínimo.
+5) Día 22-30: programa inversión periódica en ETFs diversificados.
+
+Estrategia simple de inversión (largo plazo)
+• Portafolio base: 70% ETF global de acciones + 20% ETF de bonos agregados + 10% ETF de mercados emergentes.
+• Aporte mensual fijo (${money(invest)}) y rebalanceo cada 6-12 meses.
+• Horizonte de 10+ años, sin intentar adivinar el mercado.
+
+Riesgos a evitar
+• Invertir sin fondo de emergencia.
+• Mantener deuda cara mientras se invierte agresivo.
+• Cambiar estrategia por miedo o noticias del momento.
+
+Métricas mensuales a monitorear
+• Tasa de ahorro real (% de ingreso).
+• Ratio deuda/ingreso (%).
+• Patrimonio neto (ahorros + inversiones - deudas).`;
+    }
+
     $('analyze').addEventListener('click', analyze);
     ['monthlyInvest','annualRate','years'].forEach(id=>$(id).addEventListener('input', ()=>updateGrowth()));
+    $('saveProfile').addEventListener('click', saveProfile);
+    $('generatePlan').addEventListener('click', generateAdvice);
+    loadProfile();
     analyze();
   </script>
 </body>
